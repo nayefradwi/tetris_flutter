@@ -36,7 +36,7 @@ class _GameScreenState extends State<GameScreen> {
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // game board
                     Expanded(child: GameBoard())

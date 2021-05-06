@@ -20,16 +20,21 @@ class _GameBoardState extends State<GameBoard> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 10),
-      child: GridView.count(
-        crossAxisSpacing: 5,
-        mainAxisSpacing: 5,
-        childAspectRatio: (size.height / size.width * 0.65),
-        physics: NeverScrollableScrollPhysics(),
-        crossAxisCount: 10,
-        children: pixels,
+    return GestureDetector(
+      child: Container(
+        child: GridView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: pixels.length,
+          padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 1.25,
+              crossAxisCount: 10,
+              crossAxisSpacing: 3,
+              mainAxisSpacing: 3),
+          itemBuilder: (context, index) {
+            return pixels[index];
+          },
+        ),
       ),
     );
   }
