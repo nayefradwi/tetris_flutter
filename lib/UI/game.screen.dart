@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tetris/UI/gameboard.widget.dart';
+import 'package:tetris/UI/scoreboard.widget.dart';
 
 class GameScreen extends StatefulWidget {
   @override
@@ -38,9 +39,10 @@ class _GameScreenState extends State<GameScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // game board
-                    Expanded(child: GameBoard())
+                    // game board, 550 is the max?
+                    Expanded(flex: 3, child: GameBoard()),
                     // score board
+                    Expanded(child: ScoreBoardWidget())
                   ],
                 ),
               )

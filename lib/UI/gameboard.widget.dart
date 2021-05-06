@@ -14,7 +14,7 @@ class _GameBoardState extends State<GameBoard> {
     for (int i = 0; i < 200; i++)
       pixels.add(PixelWidget(
         Colors.white10,
-        number: i,
+        // number: i,
       ));
   }
 
@@ -27,7 +27,7 @@ class _GameBoardState extends State<GameBoard> {
           itemCount: pixels.length,
           padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 1.25,
+              childAspectRatio: 0.89,
               crossAxisCount: 10,
               crossAxisSpacing: 3,
               mainAxisSpacing: 3),
