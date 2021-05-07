@@ -28,13 +28,27 @@ abstract class Tetromino {
 
   List<int> moveRight() {
     List<int> oldPositions = [...pixelPositions];
-    for (int i = 0; i < pixelPositions.length; i++) pixelPositions[i]++;
+    for (int i = 0; i < pixelPositions.length; i++) {
+      if (pixelPositions[i] % 10 == 9) {
+        pixelPositions.clear();
+        pixelPositions.addAll([...oldPositions]);
+        break;
+      }
+      pixelPositions[i]++;
+    }
     return oldPositions;
   }
 
   List<int> moveLeft() {
     List<int> oldPositions = [...pixelPositions];
-    for (int i = 0; i < pixelPositions.length; i++) pixelPositions[i]--;
+    for (int i = 0; i < pixelPositions.length; i++) {
+      if (pixelPositions[i] % 10 == 0) {
+        pixelPositions.clear();
+        pixelPositions.addAll([...oldPositions]);
+        break;
+      }
+      pixelPositions[i]--;
+    }
     return oldPositions;
   }
 }
