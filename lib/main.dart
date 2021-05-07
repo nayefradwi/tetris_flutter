@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Tetris',
       theme: ThemeData(colorScheme: ColorScheme.dark()),
       home: ResponsiveLayout(),
     );

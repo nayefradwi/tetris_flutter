@@ -41,6 +41,16 @@ class _GameScreenState extends State<GameScreen> {
                           TextDecoration.overline
                         ])),
                   ),
+                  TextButton(
+                      onPressed: () => _gameStream.startGame(),
+                      child: Text("START",
+                          style: TextStyle(
+                              fontFamily: "vt323",
+                              fontSize: 60,
+                              decoration: TextDecoration.combine([
+                                TextDecoration.underline,
+                                TextDecoration.overline
+                              ]))))
                 ],
               ),
               Expanded(

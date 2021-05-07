@@ -37,7 +37,7 @@ class _GameBoardState extends State<GameBoard> {
                 itemCount: _gameStream.pixels.length,
                 padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    childAspectRatio: 0.89,
+                    childAspectRatio: 0.91,
                     crossAxisCount: 10,
                     crossAxisSpacing: 3,
                     mainAxisSpacing: 3),

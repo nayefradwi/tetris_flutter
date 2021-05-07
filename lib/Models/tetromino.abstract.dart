@@ -9,4 +9,9 @@ abstract class Tetromino {
   List<int>? moveRight();
   List<int>? moveLeft();
   List<int>? rotate();
+  List<int> moveDown() {
+    List<int> oldPositions = [...pixelPositions];
+    for (int i = 0; i < pixelPositions.length; i++) pixelPositions[i] += 10;
+    return oldPositions;
+  }
 }
