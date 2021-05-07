@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tetris/UI/gameboard.widget.dart';
 import 'package:tetris/UI/scoreboard.widget.dart';
+import 'package:tetris/state_management/game.stream.dart';
 
 class GameScreen extends StatefulWidget {
   @override
@@ -8,6 +9,14 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  final GameStream _gameStream = GameStream.get();
+
+  @override
+  void initState() {
+    _gameStream.init();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,5 +60,11 @@ class _GameScreenState extends State<GameScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _gameStream.dispose();
+    super.dispose();
   }
 }
