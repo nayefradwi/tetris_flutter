@@ -24,11 +24,13 @@ class _GameBoardState extends State<GameBoard> {
             onDoubleTap: () {
               // rotate piece
             },
-            onPanUpdate: (details) {
-              if (details.delta.dx > 0) {
-                // swiped rigth so move right
-              } else if (details.delta.dx < 0) {
+            onPanEnd: (details) {
+              if (details.velocity.pixelsPerSecond.dx > 0) {
+                // swiped right so move right
+                _gameStream.moveRight();
+              } else if (details.velocity.pixelsPerSecond.dx < 0) {
                 // swiped left so move left
+                _gameStream.moveLeft();
               }
             },
             child: Container(

@@ -26,7 +26,7 @@ class GameStream {
 
   Random _random = Random();
   late Tetromino nextTetromino;
-  late Tetromino currentTetromino;
+  late Tetromino _currentTetromino;
   List<int> _landedPixels = [];
   Stream<GameEvents> get gameStreamSubscription => _gameStreamController.stream;
   Duration gameDifficulty = Duration(milliseconds: 500);
@@ -38,6 +38,7 @@ class GameStream {
 
   _gameLoop(Tetromino currentTetromino) {
     if (!hasGameStarted) return;
+    _currentTetromino = currentTetromino;
     Timer.periodic(gameDifficulty, (timer) {
       if (checkIfLanded(currentTetromino)) {
         _displayTetromino(currentTetromino);
@@ -47,14 +48,10 @@ class GameStream {
         timer.cancel();
         _gameLoop(currentTetromino);
       } else {
-        List<int> oldPostions = currentTetromino.moveDown();
+        List<int> oldPositions = currentTetromino.moveDown();
 
         // 2) clear previous row
-        for (int i in oldPostions) {
-          pixels[i] = PixelWidget(
-            color: Colors.white10,
-          );
-        }
+        _clearOldPositions(oldPositions);
 
         // 3) set new pixels
         _displayTetromino(currentTetromino);
@@ -74,8 +71,17 @@ class GameStream {
     _gameStreamController.sink.add(GameEndedEvent());
   }
 
-  void moveLeft() {}
-  void moveRight() {}
+  void moveLeft() {
+    List<int> oldPositions = _currentTetromino.moveLeft();
+    _clearOldPositions(oldPositions);
+    _displayTetromino(_currentTetromino);
+  }
+
+  void moveRight() {
+    List<int> oldPositions = _currentTetromino.moveRight();
+    _clearOldPositions(oldPositions);
+    _displayTetromino(_currentTetromino);
+  }
 
   void dispose() {
     _gameStreamController.close();
@@ -91,6 +97,14 @@ class GameStream {
     positions.sort((b, a) => a.compareTo(b));
     if ((positions[0] / 10).floor() == 19) return true;
     return false;
+  }
+
+  void _clearOldPositions(oldPositions) {
+    for (int i in oldPositions) {
+      pixels[i] = PixelWidget(
+        color: Colors.white10,
+      );
+    }
   }
 
   void _displayTetromino(Tetromino nextTetromino) {
