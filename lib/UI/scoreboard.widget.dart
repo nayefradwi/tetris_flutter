@@ -24,10 +24,12 @@ class _ScoreBoardWidgetState extends State<ScoreBoardWidget> {
                   textAlign: TextAlign.center,
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.fromLTRB(8, 3, 8, 8),
                   child: Container(
                     height: 80,
-                    color: Color(0xff131313),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Color(0xff131313)),
                   ),
                 ),
               ],
@@ -36,14 +38,17 @@ class _ScoreBoardWidgetState extends State<ScoreBoardWidget> {
         ),
         Text(
           "Time:",
-          style:
-              TextStyle(fontSize: 32, color: Colors.white, fontFamily: "VT323"),
+          style: TextStyle(
+            fontSize: 32,
+            color: Color(0xffBB86FC),
+            fontFamily: "VT323",
+          ),
           textAlign: TextAlign.center,
         ),
         Text(
           "20H 60M 32S",
-          style:
-              TextStyle(fontSize: 22, color: Colors.white, fontFamily: "VT323"),
+          style: TextStyle(
+              fontSize: 22, color: Color(0xffBB86FC), fontFamily: "VT323"),
           textAlign: TextAlign.center,
         ),
       ],

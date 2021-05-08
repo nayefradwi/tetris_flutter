@@ -29,7 +29,7 @@ class GameStream {
   late Tetromino _currentTetromino;
   List<int> _landedPixels = [];
   Stream<GameEvents> get gameStreamSubscription => _gameStreamController.stream;
-  Duration gameDifficulty = Duration(milliseconds: 500);
+  Duration gameDifficulty = Duration(milliseconds: 150);
 
   void init() {
     nextTetromino = _getRandomTetromino();
@@ -42,8 +42,23 @@ class GameStream {
     Timer.periodic(gameDifficulty, (timer) {
       if (checkIfLanded(currentTetromino)) {
         _displayTetromino(currentTetromino);
-        // a) check if clear row
+        _landedPixels.addAll(currentTetromino.pixelPositions);
+
+        // a) clear row
+        List<int> rowsLanded =
+            _landedPixels.map<int>((e) => (e / 10).floor()).toList();
+        Map<int, int> count = {};
+        rowsLanded.forEach(
+            (i) => count[i] = count.containsKey(i) ? count[i]! + 1 : 1);
+
+        List<int> rowsToDelete = [];
+        for (MapEntry<int, int> entry in count.entries) {
+          if (entry.value == 10) rowsToDelete.add(entry.key);
+        }
+        if (rowsToDelete.isNotEmpty) deleteRows(rowsToDelete, rowsLanded);
+
         // b) check if game ended
+
         currentTetromino = _getRandomTetromino();
         timer.cancel();
         _gameLoop(currentTetromino);
@@ -94,8 +109,11 @@ class GameStream {
 
   bool checkIfLanded(Tetromino current) {
     List<int> positions = [...current.pixelPositions];
+    List<int> positions2 =
+        current.pixelPositions.map<int>((e) => e + 10).toList();
     positions.sort((b, a) => a.compareTo(b));
-    if ((positions[0] / 10).floor() == 19) return true;
+    if ((positions[0] / 10).floor() == 19 ||
+        positions2.any((item) => _landedPixels.contains(item))) return true;
     return false;
   }
 
@@ -114,5 +132,33 @@ class GameStream {
       );
     }
     _gameStreamController.sink.add(UpdateGameBoardEvent());
+  }
+
+  void deleteRows(List<int> rowsToDelete, List<int> rows) {
+    List<int> old = [..._landedPixels];
+
+    // delete each row
+    for (int i = 0; i < rowsToDelete.length; i++) {
+      for (int ii = rowsToDelete[i] * 10;
+          ii < (rowsToDelete[i] + 1) * 10;
+          ii++) {
+        pixels[ii] = PixelWidget();
+        _landedPixels.remove(ii);
+      }
+    }
+
+    // remove landed pixels
+    _landedPixels = _landedPixels.map<int>((e) {
+      return e + 10 * rowsToDelete.length;
+    }).toList();
+
+    // shift dowm
+    old.sort((b, a) => a.compareTo(b));
+    List<PixelWidget> pixelsBefore = [...pixels];
+    for (int i = 0; i < rows.length; i++) {
+      for (int ii = rows[i] * 10; ii < (rows[i] + 1) * 10; ii++) {
+        pixels[ii] = pixelsBefore[ii - 10 * rowsToDelete.length];
+      }
+    }
   }
 }

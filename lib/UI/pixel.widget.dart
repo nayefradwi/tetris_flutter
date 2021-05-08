@@ -5,7 +5,7 @@ class PixelWidget extends StatefulWidget {
   final int? number;
   const PixelWidget({
     Key? key,
-    this.color,
+    this.color: Colors.white10,
     this.number,
   }) : super(key: key);
 
@@ -17,7 +17,7 @@ class _PixelWidgetState extends State<PixelWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: widget.color ?? Colors.white10,
+      color: widget.color,
       child: Visibility(
           visible: widget.number != null,
           child: Center(child: Text(widget.number.toString()))),
