@@ -33,7 +33,10 @@ class GameStream {
 
   void init() {
     nextTetromino = _getRandomTetromino();
-    for (int i = 0; i < 200; i++) pixels.add(PixelWidget());
+    for (int i = 0; i < 200; i++)
+      pixels.add(PixelWidget(
+        number: i,
+      ));
   }
 
   _gameLoop(Tetromino currentTetromino) {
@@ -96,6 +99,12 @@ class GameStream {
     List<int> oldPositions = _currentTetromino.moveRight();
     _clearOldPositions(oldPositions);
     _displayTetromino(_currentTetromino);
+  }
+
+  void rotate() {
+    // List<int> oldPositions = _currentTetromino.rotate();
+    // _clearOldPositions(oldPositions);
+    // _displayTetromino(_currentTetromino);
   }
 
   void dispose() {

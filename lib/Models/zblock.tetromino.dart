@@ -6,8 +6,14 @@ class ZBlock extends Tetromino {
   ZBlock() : super(const Color(0xffFF0000), [4, 5, 15, 16]);
 
   @override
-  List<int>? rotate() {
-    // TODO: implement rotate
+  List<int> rotateNext() {
+    // TODO: implement rotateNext
+    throw UnimplementedError();
+  }
+
+  @override
+  List<int> rotatePrevious() {
+    // TODO: implement rotatePrevious
     throw UnimplementedError();
   }
 }

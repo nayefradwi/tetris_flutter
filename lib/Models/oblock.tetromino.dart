@@ -6,7 +6,14 @@ class OBlock extends Tetromino {
   OBlock() : super(const Color(0xffFFC000), [4, 5, 14, 15]);
 
   @override
-  List<int>? rotate() {
+  List<int> rotateNext() {
+    // TODO: implement rotateNext
+    throw UnimplementedError();
+  }
+
+  @override
+  List<int> rotatePrevious() {
+    // TODO: implement rotatePrevious
     throw UnimplementedError();
   }
 }
