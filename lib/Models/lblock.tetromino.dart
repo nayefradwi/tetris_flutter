@@ -22,8 +22,12 @@ class LBlock extends Tetromino {
       // modify the rows
       int a = _rotations[currentRotationIndex][i] + y[0] * 10;
       // edge case
-      if (x[0] > 7)
-        a = a + xOffset - 3;
+      if (currentRotationIndex == 1 && x[0] == 0)
+        a = a + xOffset + 1;
+      else if (currentRotationIndex == 2 && x[1] == 0)
+        a = a + xOffset + 1;
+      else if (currentRotationIndex == 3 && x[0] == 0)
+        a = a + xOffset + 1;
       else
         // add x - offset
         a = a + xOffset;

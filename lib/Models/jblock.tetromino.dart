@@ -2,6 +2,10 @@ import 'dart:ui';
 
 import 'package:tetris/Models/tetromino.abstract.dart';
 
+// no edge cases at the left
+// edge cases at the right:
+//   -  rotation_index = 1 && array_index = 0
+//   -  rotation_index = 3 && array_index = 1
 class JBlock extends Tetromino {
   JBlock() : super(const Color(0xff7030A0), [4, 14, 24, 23]);
   List<List<int>> _rotations = [
@@ -22,10 +26,12 @@ class JBlock extends Tetromino {
       // modify the rows
       int a = _rotations[currentRotationIndex][i] + y[0] * 10;
       // edge case
-      if (x[0] == 0)
-        a = a + xOffset - 3;
+      if (currentRotationIndex == 1 && x[0] == 9)
+        a = a + xOffset - 1;
+      else if (currentRotationIndex == 3 && x[1] == 9)
+        a = a + xOffset - 1;
+      // add x - offset
       else
-        // add x - offset
         a = a + xOffset;
       newPositions.add(a);
     }
