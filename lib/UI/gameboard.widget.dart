@@ -23,6 +23,7 @@ class _GameBoardState extends State<GameBoard> {
           return GestureDetector(
             onDoubleTap: () {
               // rotate piece
+              _gameStream.rotateNext();
             },
             onPanEnd: (details) {
               if (details.velocity.pixelsPerSecond.dx > 0) {

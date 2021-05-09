@@ -1,33 +1,36 @@
 import 'dart:ui';
-
 import 'package:tetris/Models/tetromino.abstract.dart';
 
 class IBlock extends Tetromino {
   IBlock() : super(const Color(0xff4472C4), [4, 14, 24, 34]);
-  // List<List<int>> _rotations = [
-  //   [4, 14, 24, 34],
-  //   [23, 24, 25, 26],
-  //   [5, 15, 25, 35],
-  //   [23, 24, 25, 26],
-  // ];
-  // int _currentRotationIndex = 0;
+  List<List<int>> _rotations = [
+    [4, 14, 24, 34],
+    [4, 5, 6, 7],
+  ];
+
+  // which rotation im at
+
   @override
   List<int> rotateNext() {
+    currentRotationIndex = (currentRotationIndex + 1) % _rotations.length;
     List<int> old = [...pixelPositions];
-    // get center piece
-    int sum = 0;
-    // for (int i = 0; i < pixelPositions.length; i++) {
-    //   pixelPositions[i] = _rotations[++_currentRotationIndex][i];
-    // }
-    return old;
-  }
+    List<int> x = old.map((e) => ((e / 10).floor() * 10 - e).abs()).toList();
+    List<int> y = old.map((e) => (e / 10).floor()).toList();
 
-// offset from x axis (%10) +
-  @override
-  List<int> rotatePrevious() {
-    List<int> old = [...pixelPositions];
-    // pixelPositions.clear();
-    // pixelPositions.addAll(_rotations[++_currentRotationIndex]);
+    List<int> newPositions = [];
+    for (int i = 0; i < pixelPositions.length; i++) {
+      // modify the rows
+      int a = _rotations[currentRotationIndex][i] + y[0] * 10;
+      // edge case
+      if (x[0] > 6)
+        a = a + xOffset - 3;
+      else
+        // add x - offset
+        a = a + xOffset;
+      newPositions.add(a);
+    }
+    pixelPositions.clear();
+    pixelPositions.addAll(newPositions);
     return old;
   }
 }

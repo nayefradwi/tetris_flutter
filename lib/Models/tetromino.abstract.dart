@@ -18,9 +18,10 @@ abstract class Tetromino {
   final Color color;
   final List<int> pixelPositions;
   final String? imageAsset;
-  const Tetromino(this.color, this.pixelPositions, {this.imageAsset});
+  Tetromino(this.color, this.pixelPositions, {this.imageAsset});
+  int xOffset = 0;
+  int currentRotationIndex = 0;
   List<int> rotateNext();
-  List<int> rotatePrevious();
   List<int> moveDown() {
     List<int> oldPositions = [...pixelPositions];
     for (int i = 0; i < pixelPositions.length; i++) pixelPositions[i] += 10;
@@ -33,10 +34,11 @@ abstract class Tetromino {
       if (pixelPositions[i] % 10 == 9) {
         pixelPositions.clear();
         pixelPositions.addAll([...oldPositions]);
-        break;
+        return oldPositions;
       }
       pixelPositions[i]++;
     }
+    xOffset++;
     return oldPositions;
   }
 
@@ -46,10 +48,16 @@ abstract class Tetromino {
       if (pixelPositions[i] % 10 == 0) {
         pixelPositions.clear();
         pixelPositions.addAll([...oldPositions]);
-        break;
+        return oldPositions;
       }
       pixelPositions[i]--;
     }
+    xOffset--;
     return oldPositions;
+  }
+
+  int medianIndex(List<int> a) {
+    var middle = a.length ~/ 2;
+    return middle - 1;
   }
 }

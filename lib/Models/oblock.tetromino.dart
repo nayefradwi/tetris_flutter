@@ -7,13 +7,6 @@ class OBlock extends Tetromino {
 
   @override
   List<int> rotateNext() {
-    // TODO: implement rotateNext
-    throw UnimplementedError();
-  }
-
-  @override
-  List<int> rotatePrevious() {
-    // TODO: implement rotatePrevious
-    throw UnimplementedError();
+    return [...pixelPositions];
   }
 }

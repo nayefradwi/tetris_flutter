@@ -15,13 +15,13 @@ class GameStream {
   bool hasGameStarted = false;
   List<PixelWidget> pixels = [];
   List<Function> tetrominos = [
-    Tetromino.iblock,
-    Tetromino.jblock,
-    Tetromino.sblock,
-    Tetromino.lblock,
     Tetromino.oblock,
+    Tetromino.sblock,
+    Tetromino.zblock,
+    Tetromino.jblock,
+    Tetromino.lblock,
     Tetromino.tblock,
-    Tetromino.zblock
+    Tetromino.iblock
   ];
 
   Random _random = Random();
@@ -29,7 +29,7 @@ class GameStream {
   late Tetromino _currentTetromino;
   List<int> _landedPixels = [];
   Stream<GameEvents> get gameStreamSubscription => _gameStreamController.stream;
-  Duration gameDifficulty = Duration(milliseconds: 150);
+  Duration gameDifficulty = Duration(milliseconds: 300);
 
   void init() {
     nextTetromino = _getRandomTetromino();
@@ -101,10 +101,10 @@ class GameStream {
     _displayTetromino(_currentTetromino);
   }
 
-  void rotate() {
-    // List<int> oldPositions = _currentTetromino.rotate();
-    // _clearOldPositions(oldPositions);
-    // _displayTetromino(_currentTetromino);
+  void rotateNext() {
+    List<int> oldPositions = _currentTetromino.rotateNext();
+    _clearOldPositions(oldPositions);
+    _displayTetromino(_currentTetromino);
   }
 
   void dispose() {
