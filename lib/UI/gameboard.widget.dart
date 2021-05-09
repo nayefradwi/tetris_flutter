@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tetris/state_management/game.events.dart';
 import 'package:tetris/state_management/game.stream.dart';
 
 class GameBoard extends StatefulWidget {
@@ -18,7 +19,8 @@ class _GameBoardState extends State<GameBoard> {
     // need it to rebuild when ever stream gets an event, display a dailog box
     // when game ends
     return StreamBuilder(
-        stream: _gameStream.gameStreamSubscription,
+        stream: _gameStream.gameStreamSubscription
+            .where((event) => !(event is UpdateNextWidgetEvent)),
         builder: (context, snapshot) {
           return GestureDetector(
             onDoubleTap: () {

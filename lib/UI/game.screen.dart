@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tetris/UI/gameboard.widget.dart';
 import 'package:tetris/UI/scoreboard.widget.dart';
+import 'package:tetris/state_management/game.events.dart';
 import 'package:tetris/state_management/game.stream.dart';
 
 class GameScreen extends StatefulWidget {
@@ -41,16 +42,35 @@ class _GameScreenState extends State<GameScreen> {
                           TextDecoration.overline
                         ])),
                   ),
-                  TextButton(
-                      onPressed: () => _gameStream.startGame(),
-                      child: Text("START",
-                          style: TextStyle(
-                              fontFamily: "vt323",
-                              fontSize: 60,
-                              decoration: TextDecoration.combine([
-                                TextDecoration.underline,
-                                TextDecoration.overline
-                              ]))))
+                  StreamBuilder<GameEvents>(
+                      stream: _gameStream.gameStreamSubscription.where(
+                          (event) =>
+                              !(event is UpdateNextWidgetEvent) &&
+                              !(event is UpdateGameBoardEvent)),
+                      builder: (context, snapshot) {
+                        if (_gameStream.hasGameStarted)
+                          return TextButton(
+                              onPressed: () => _gameStream.endGame(),
+                              child: Text("END",
+                                  style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontFamily: "vt323",
+                                      fontSize: 60,
+                                      decoration: TextDecoration.combine([
+                                        TextDecoration.underline,
+                                        TextDecoration.overline
+                                      ]))));
+                        return TextButton(
+                            onPressed: () => _gameStream.startGame(),
+                            child: Text("START",
+                                style: TextStyle(
+                                    fontFamily: "vt323",
+                                    fontSize: 60,
+                                    decoration: TextDecoration.combine([
+                                      TextDecoration.underline,
+                                      TextDecoration.overline
+                                    ]))));
+                      })
                 ],
               ),
               Expanded(

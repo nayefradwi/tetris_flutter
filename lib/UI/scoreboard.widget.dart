@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tetris/state_management/game.stream.dart';
 
 class ScoreBoardWidget extends StatefulWidget {
   @override
@@ -25,11 +26,28 @@ class _ScoreBoardWidgetState extends State<ScoreBoardWidget> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 3, 8, 8),
-                  child: Container(
+                  child: SizedBox(
                     height: 80,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Color(0xff131313)),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Color(0xff131313)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: GridView.count(
+                                  crossAxisCount: 8,
+                                  children: GameStream.get().nextPixels,
+                                  childAspectRatio: 1,
+                                  crossAxisSpacing: 1,
+                                  mainAxisSpacing: 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -14,6 +14,7 @@ class GameStream {
       StreamController<GameEvents>.broadcast();
   bool hasGameStarted = false;
   List<PixelWidget> pixels = [];
+  List<PixelWidget> nextPixels = [];
   List<Function> tetrominos = [
     Tetromino.lblock,
     Tetromino.jblock,
@@ -30,16 +31,40 @@ class GameStream {
   List<int> _landedPixels = [];
   Stream<GameEvents> get gameStreamSubscription => _gameStreamController.stream;
   Duration gameDifficulty = Duration(milliseconds: 300);
-
+  late Timer _gameTimer;
   void init() {
     nextTetromino = _getRandomTetromino();
     for (int i = 0; i < 200; i++) pixels.add(PixelWidget());
   }
 
+  void _refresh() {
+    pixels.clear();
+    _landedPixels.clear();
+    init();
+  }
+
+  void recreateNextPixels({required Tetromino toDisplay}) {
+    nextPixels.clear();
+    for (int i = 0; i < 64; i++) {
+      if (toDisplay.pixelPositions.contains(i)) {
+        nextPixels.insert(
+            i,
+            PixelWidget(
+              color: toDisplay.color,
+            ));
+      } else {
+        nextPixels.add(PixelWidget());
+      }
+    }
+    _gameStreamController.sink.add(UpdateNextWidgetEvent());
+  }
+
   _gameLoop(Tetromino currentTetromino) {
     if (!hasGameStarted) return;
     _currentTetromino = currentTetromino;
-    Timer.periodic(gameDifficulty, (timer) {
+
+    _displayTetromino(currentTetromino);
+    _gameTimer = Timer.periodic(gameDifficulty, (timer) {
       if (checkIfLanded(currentTetromino)) {
         _displayTetromino(currentTetromino);
         _landedPixels.addAll(currentTetromino.pixelPositions);
@@ -47,28 +72,29 @@ class GameStream {
         // a) clear row
         List<int> rowsLanded =
             _landedPixels.map<int>((e) => (e / 10).floor()).toList();
-        Map<int, int> count = {};
-        rowsLanded.forEach(
-            (i) => count[i] = count.containsKey(i) ? count[i]! + 1 : 1);
+        if (rowsLanded.contains(0)) {
+          endGame();
+          timer.cancel();
+        } else {
+          Map<int, int> count = {};
+          rowsLanded.forEach(
+              (i) => count[i] = count.containsKey(i) ? count[i]! + 1 : 1);
 
-        List<int> rowsToDelete = [];
-        for (MapEntry<int, int> entry in count.entries) {
-          if (entry.value == 10) rowsToDelete.add(entry.key);
+          List<int> rowsToDelete = [];
+          for (MapEntry<int, int> entry in count.entries) {
+            if (entry.value == 10) rowsToDelete.add(entry.key);
+          }
+          if (rowsToDelete.isNotEmpty) deleteRows(rowsToDelete, 0);
+
+          // b) check if game ended
+
+          currentTetromino = _getRandomTetromino();
+          timer.cancel();
+          _gameLoop(currentTetromino);
         }
-        if (rowsToDelete.isNotEmpty) deleteRows(rowsToDelete, 0);
-
-        // b) check if game ended
-
-        currentTetromino = _getRandomTetromino();
-        timer.cancel();
-        _gameLoop(currentTetromino);
       } else {
         List<int> oldPositions = currentTetromino.moveDown();
-
-        // 2) clear previous row
         _clearOldPositions(oldPositions);
-
-        // 3) set new pixels
         _displayTetromino(currentTetromino);
       }
     });
@@ -84,6 +110,8 @@ class GameStream {
   void endGame() {
     hasGameStarted = false;
     _gameStreamController.sink.add(GameEndedEvent());
+    _gameTimer.cancel();
+    _refresh();
   }
 
   void moveLeft() {
@@ -115,7 +143,9 @@ class GameStream {
 
   Tetromino _getRandomTetromino() {
     int index = _random.nextInt(tetrominos.length);
-    return tetrominos[index]();
+    Tetromino t = tetrominos[index]();
+    recreateNextPixels(toDisplay: t);
+    return t;
   }
 
   bool checkIfLanded(Tetromino current) {
@@ -145,10 +175,6 @@ class GameStream {
     _gameStreamController.sink.add(UpdateGameBoardEvent());
   }
 
-  // should be a recursive function
-  // go from the row of the smallest digit in landed pixels
-  // to the last element in the row deleted
-  // then every element will shift down
   void deleteRows(List<int> rowsToDelete, int index) {
     List<int> landedPixelsSorted = [..._landedPixels];
     List<PixelWidget> pixelsCopy = [...pixels];
@@ -189,20 +215,6 @@ class GameStream {
     }
     deleteRows(rowsToDelete, ++index);
   }
-
-  // // remove landed pixels
-  // _landedPixels = _landedPixels.map<int>((e) {
-  //   return e + 10 * rowsToDelete.length;
-  // }).toList();
-
-  // // shift dowm
-  // old.sort((b, a) => a.compareTo(b));
-  // List<PixelWidget> pixelsBefore = [...pixels];
-  // for (int i = 0; i < rows.length; i++) {
-  //   for (int ii = rows[i] * 10; ii < (rows[i] + 1) * 10; ii++) {
-  //     pixels[ii] = pixelsBefore[ii - 10 * rowsToDelete.length];
-  //   }
-  // }
 
   bool checkIfPixelsOverlapping(List<int> oldPositions) {
     for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
