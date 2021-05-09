@@ -45,13 +45,11 @@ class GameStream {
 
   void recreateNextPixels({required Tetromino toDisplay}) {
     nextPixels.clear();
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 50; i++) {
       if (toDisplay.pixelPositions.contains(i)) {
-        nextPixels.insert(
-            i,
-            PixelWidget(
-              color: toDisplay.color,
-            ));
+        nextPixels.add(PixelWidget(
+          color: toDisplay.color,
+        ));
       } else {
         nextPixels.add(PixelWidget());
       }
@@ -62,7 +60,7 @@ class GameStream {
   _gameLoop(Tetromino currentTetromino) {
     if (!hasGameStarted) return;
     _currentTetromino = currentTetromino;
-
+    Tetromino nextTetromino = _getRandomTetromino();
     _displayTetromino(currentTetromino);
     _gameTimer = Timer.periodic(gameDifficulty, (timer) {
       if (checkIfLanded(currentTetromino)) {
@@ -88,9 +86,8 @@ class GameStream {
 
           // b) check if game ended
 
-          currentTetromino = _getRandomTetromino();
           timer.cancel();
-          _gameLoop(currentTetromino);
+          _gameLoop(nextTetromino);
         }
       } else {
         List<int> oldPositions = currentTetromino.moveDown();

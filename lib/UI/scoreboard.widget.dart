@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tetris/state_management/game.events.dart';
 import 'package:tetris/state_management/game.stream.dart';
 
 class ScoreBoardWidget extends StatefulWidget {
@@ -7,6 +8,7 @@ class ScoreBoardWidget extends StatefulWidget {
 }
 
 class _ScoreBoardWidgetState extends State<ScoreBoardWidget> {
+  GameStream _gameStream = GameStream.get();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,25 +29,38 @@ class _ScoreBoardWidgetState extends State<ScoreBoardWidget> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 3, 8, 8),
                   child: SizedBox(
-                    height: 80,
+                    height: 55,
                     child: Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           color: Color(0xff131313)),
                       child: Padding(
                         padding: const EdgeInsets.all(5.0),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: GridView.count(
-                                  crossAxisCount: 8,
-                                  children: GameStream.get().nextPixels,
-                                  childAspectRatio: 1,
-                                  crossAxisSpacing: 1,
-                                  mainAxisSpacing: 1),
-                            ),
-                          ],
-                        ),
+                        child: StreamBuilder<GameEvents>(
+                            stream: _gameStream.gameStreamSubscription.where(
+                                (event) => event is UpdateNextWidgetEvent),
+                            builder: (context, snapshot) {
+                              print("built");
+                              return Column(
+                                children: [
+                                  Expanded(
+                                    child: GridView.builder(
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: _gameStream.nextPixels.length,
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                              childAspectRatio: 0.75,
+                                              crossAxisCount: 10,
+                                              crossAxisSpacing: 1,
+                                              mainAxisSpacing: 1),
+                                      itemBuilder: (context, index) {
+                                        return _gameStream.nextPixels[index];
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
                       ),
                     ),
                   ),

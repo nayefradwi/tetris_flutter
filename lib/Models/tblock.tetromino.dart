@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:tetris/Models/tetromino.abstract.dart';
 
 class TBlock extends Tetromino {
-  TBlock() : super(const Color(0xffED7D31), [14, 23, 24, 25]);
+  TBlock() : super(const Color(0xffED7D31), [4, 13, 14, 15]);
   List<List<int>> _rotations = [
-    [14, 23, 24, 25],
-    [34, 23, 24, 25],
+    [4, 13, 14, 15],
+    [24, 13, 14, 15],
   ];
 
   @override
