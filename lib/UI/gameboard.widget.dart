@@ -23,15 +23,15 @@ class _GameBoardState extends State<GameBoard> {
           return GestureDetector(
             onDoubleTap: () {
               // rotate piece
-              _gameStream.rotateNext();
+              if (_gameStream.hasGameStarted) _gameStream.rotateNext();
             },
             onPanEnd: (details) {
               if (details.velocity.pixelsPerSecond.dx > 0) {
                 // swiped right so move right
-                _gameStream.moveRight();
+                if (_gameStream.hasGameStarted) _gameStream.moveRight();
               } else if (details.velocity.pixelsPerSecond.dx < 0) {
                 // swiped left so move left
-                _gameStream.moveLeft();
+                if (_gameStream.hasGameStarted) _gameStream.moveLeft();
               }
             },
             child: Container(

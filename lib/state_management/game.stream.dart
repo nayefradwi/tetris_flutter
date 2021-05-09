@@ -16,12 +16,12 @@ class GameStream {
   List<PixelWidget> pixels = [];
   List<Function> tetrominos = [
     Tetromino.lblock,
-    Tetromino.lblock,
-    Tetromino.lblock,
-    Tetromino.lblock,
-    Tetromino.lblock,
-    Tetromino.lblock,
-    Tetromino.lblock
+    Tetromino.jblock,
+    Tetromino.sblock,
+    Tetromino.zblock,
+    Tetromino.tblock,
+    Tetromino.oblock,
+    Tetromino.iblock
   ];
 
   Random _random = Random();
@@ -42,39 +42,39 @@ class GameStream {
   _gameLoop(Tetromino currentTetromino) {
     if (!hasGameStarted) return;
     _currentTetromino = currentTetromino;
-    // Timer.periodic(gameDifficulty, (timer) {
-    //   if (checkIfLanded(currentTetromino)) {
-    //     _displayTetromino(currentTetromino);
-    //     _landedPixels.addAll(currentTetromino.pixelPositions);
+    Timer.periodic(gameDifficulty, (timer) {
+      if (checkIfLanded(currentTetromino)) {
+        _displayTetromino(currentTetromino);
+        _landedPixels.addAll(currentTetromino.pixelPositions);
 
-    //     // a) clear row
-    //     List<int> rowsLanded =
-    //         _landedPixels.map<int>((e) => (e / 10).floor()).toList();
-    //     Map<int, int> count = {};
-    //     rowsLanded.forEach(
-    //         (i) => count[i] = count.containsKey(i) ? count[i]! + 1 : 1);
+        // a) clear row
+        List<int> rowsLanded =
+            _landedPixels.map<int>((e) => (e / 10).floor()).toList();
+        Map<int, int> count = {};
+        rowsLanded.forEach(
+            (i) => count[i] = count.containsKey(i) ? count[i]! + 1 : 1);
 
-    //     List<int> rowsToDelete = [];
-    //     for (MapEntry<int, int> entry in count.entries) {
-    //       if (entry.value == 10) rowsToDelete.add(entry.key);
-    //     }
-    //     if (rowsToDelete.isNotEmpty) deleteRows(rowsToDelete, rowsLanded);
+        List<int> rowsToDelete = [];
+        for (MapEntry<int, int> entry in count.entries) {
+          if (entry.value == 10) rowsToDelete.add(entry.key);
+        }
+        if (rowsToDelete.isNotEmpty) deleteRows(rowsToDelete, rowsLanded);
 
-    //     // b) check if game ended
+        // b) check if game ended
 
-    //     currentTetromino = _getRandomTetromino();
-    //     timer.cancel();
-    //     _gameLoop(currentTetromino);
-    //   } else {
-    //     List<int> oldPositions = currentTetromino.moveDown();
+        currentTetromino = _getRandomTetromino();
+        timer.cancel();
+        _gameLoop(currentTetromino);
+      } else {
+        List<int> oldPositions = currentTetromino.moveDown();
 
-    //     // 2) clear previous row
-    //     _clearOldPositions(oldPositions);
+        // 2) clear previous row
+        _clearOldPositions(oldPositions);
 
-    //     // 3) set new pixels
-    //     _displayTetromino(currentTetromino);
-    //   }
-    // });
+        // 3) set new pixels
+        _displayTetromino(currentTetromino);
+      }
+    });
   }
 
   void startGame() {
@@ -91,18 +91,47 @@ class GameStream {
 
   void moveLeft() {
     List<int> oldPositions = _currentTetromino.moveLeft();
+    // so they dont move on other pixels
+    for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
+      if (pixels[_currentTetromino.pixelPositions[i]].color != Colors.white10 &&
+          pixels[_currentTetromino.pixelPositions[i]].color !=
+              _currentTetromino.color) {
+        _currentTetromino.pixelPositions.clear();
+        _currentTetromino.pixelPositions.addAll(oldPositions);
+        return;
+      }
+    }
     _clearOldPositions(oldPositions);
     _displayTetromino(_currentTetromino);
   }
 
   void moveRight() {
     List<int> oldPositions = _currentTetromino.moveRight();
+    for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
+      if (pixels[_currentTetromino.pixelPositions[i]].color != Colors.white10 &&
+          pixels[_currentTetromino.pixelPositions[i]].color !=
+              _currentTetromino.color) {
+        _currentTetromino.pixelPositions.clear();
+        _currentTetromino.pixelPositions.addAll(oldPositions);
+        return;
+      }
+    }
     _clearOldPositions(oldPositions);
     _displayTetromino(_currentTetromino);
   }
 
   void rotateNext() {
     List<int> oldPositions = _currentTetromino.rotateNext();
+    // so they dont rotate on other pixels
+    for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
+      if (pixels[_currentTetromino.pixelPositions[i]].color != Colors.white10 &&
+          pixels[_currentTetromino.pixelPositions[i]].color !=
+              _currentTetromino.color) {
+        _currentTetromino.pixelPositions.clear();
+        _currentTetromino.pixelPositions.addAll(oldPositions);
+        return;
+      }
+    }
     _clearOldPositions(oldPositions);
     _displayTetromino(_currentTetromino);
   }
