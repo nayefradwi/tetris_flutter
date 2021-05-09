@@ -33,10 +33,7 @@ class GameStream {
 
   void init() {
     nextTetromino = _getRandomTetromino();
-    for (int i = 0; i < 200; i++)
-      pixels.add(PixelWidget(
-        number: i,
-      ));
+    for (int i = 0; i < 200; i++) pixels.add(PixelWidget());
   }
 
   _gameLoop(Tetromino currentTetromino) {
@@ -58,7 +55,7 @@ class GameStream {
         for (MapEntry<int, int> entry in count.entries) {
           if (entry.value == 10) rowsToDelete.add(entry.key);
         }
-        if (rowsToDelete.isNotEmpty) deleteRows(rowsToDelete, rowsLanded);
+        if (rowsToDelete.isNotEmpty) deleteRows(rowsToDelete, 0);
 
         // b) check if game ended
 
@@ -92,30 +89,14 @@ class GameStream {
   void moveLeft() {
     List<int> oldPositions = _currentTetromino.moveLeft();
     // so they dont move on other pixels
-    for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
-      if (pixels[_currentTetromino.pixelPositions[i]].color != Colors.white10 &&
-          pixels[_currentTetromino.pixelPositions[i]].color !=
-              _currentTetromino.color) {
-        _currentTetromino.pixelPositions.clear();
-        _currentTetromino.pixelPositions.addAll(oldPositions);
-        return;
-      }
-    }
+    if (checkIfPixelsOverlapping(oldPositions)) return;
     _clearOldPositions(oldPositions);
     _displayTetromino(_currentTetromino);
   }
 
   void moveRight() {
     List<int> oldPositions = _currentTetromino.moveRight();
-    for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
-      if (pixels[_currentTetromino.pixelPositions[i]].color != Colors.white10 &&
-          pixels[_currentTetromino.pixelPositions[i]].color !=
-              _currentTetromino.color) {
-        _currentTetromino.pixelPositions.clear();
-        _currentTetromino.pixelPositions.addAll(oldPositions);
-        return;
-      }
-    }
+    if (checkIfPixelsOverlapping(oldPositions)) return;
     _clearOldPositions(oldPositions);
     _displayTetromino(_currentTetromino);
   }
@@ -123,15 +104,7 @@ class GameStream {
   void rotateNext() {
     List<int> oldPositions = _currentTetromino.rotateNext();
     // so they dont rotate on other pixels
-    for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
-      if (pixels[_currentTetromino.pixelPositions[i]].color != Colors.white10 &&
-          pixels[_currentTetromino.pixelPositions[i]].color !=
-              _currentTetromino.color) {
-        _currentTetromino.pixelPositions.clear();
-        _currentTetromino.pixelPositions.addAll(oldPositions);
-        return;
-      }
-    }
+    if (checkIfPixelsOverlapping(oldPositions)) return;
     _clearOldPositions(oldPositions);
     _displayTetromino(_currentTetromino);
   }
@@ -172,31 +145,73 @@ class GameStream {
     _gameStreamController.sink.add(UpdateGameBoardEvent());
   }
 
-  void deleteRows(List<int> rowsToDelete, List<int> rows) {
-    List<int> old = [..._landedPixels];
+  // should be a recursive function
+  // go from the row of the smallest digit in landed pixels
+  // to the last element in the row deleted
+  // then every element will shift down
+  void deleteRows(List<int> rowsToDelete, int index) {
+    List<int> landedPixelsSorted = [..._landedPixels];
+    List<PixelWidget> pixelsCopy = [...pixels];
+    landedPixelsSorted.sort();
 
-    // delete each row
-    for (int i = 0; i < rowsToDelete.length; i++) {
-      for (int ii = rowsToDelete[i] * 10;
-          ii < (rowsToDelete[i] + 1) * 10;
-          ii++) {
-        pixels[ii] = PixelWidget();
-        _landedPixels.remove(ii);
-      }
+    if (index == rowsToDelete.length) {
+      return;
     }
 
-    // remove landed pixels
-    _landedPixels = _landedPixels.map<int>((e) {
-      return e + 10 * rowsToDelete.length;
-    }).toList();
+    // deleted row pixels
+    for (int i = rowsToDelete[index] * 10;
+        i < (rowsToDelete[index] + 1) * 10;
+        i++) {
+      pixels[i] = PixelWidget();
+    }
 
-    // shift dowm
-    old.sort((b, a) => a.compareTo(b));
-    List<PixelWidget> pixelsBefore = [...pixels];
-    for (int i = 0; i < rows.length; i++) {
-      for (int ii = rows[i] * 10; ii < (rows[i] + 1) * 10; ii++) {
-        pixels[ii] = pixelsBefore[ii - 10 * rowsToDelete.length];
+    List<int> rowsLanded =
+        landedPixelsSorted.map<int>((e) => (e / 10).floor()).toList();
+
+    // shift down row
+    for (int i = rowsLanded[0] * 10; i < rowsToDelete[index] * 10; i++) {
+      // shift down pixels
+      pixels[i + 10] = pixelsCopy[i];
+      pixels[i] = pixelsCopy[i - 10];
+    }
+    // shift down landed pixels
+    for (int i = 0; i < _landedPixels.length; i++) {
+      if (rowsLanded[i] >= rowsToDelete[index]) break;
+      landedPixelsSorted[i] = landedPixelsSorted[i] + 10;
+    }
+    _landedPixels = landedPixelsSorted;
+
+    // delete landed pixels
+    for (int i = rowsToDelete[index] * 10;
+        i < rowsToDelete[index] * 10 + 10;
+        i++) {
+      _landedPixels.remove(i);
+    }
+    deleteRows(rowsToDelete, ++index);
+  }
+
+  // // remove landed pixels
+  // _landedPixels = _landedPixels.map<int>((e) {
+  //   return e + 10 * rowsToDelete.length;
+  // }).toList();
+
+  // // shift dowm
+  // old.sort((b, a) => a.compareTo(b));
+  // List<PixelWidget> pixelsBefore = [...pixels];
+  // for (int i = 0; i < rows.length; i++) {
+  //   for (int ii = rows[i] * 10; ii < (rows[i] + 1) * 10; ii++) {
+  //     pixels[ii] = pixelsBefore[ii - 10 * rowsToDelete.length];
+  //   }
+  // }
+
+  bool checkIfPixelsOverlapping(List<int> oldPositions) {
+    for (int i = 0; i < _currentTetromino.pixelPositions.length; i++) {
+      if (_landedPixels.contains(_currentTetromino.pixelPositions[i])) {
+        _currentTetromino.pixelPositions.clear();
+        _currentTetromino.pixelPositions.addAll(oldPositions);
+        return true;
       }
     }
+    return false;
   }
 }
